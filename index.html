@@ -380,12 +380,7 @@ const newItem = {
         alert("Items refreshed!");
     });
 
-    loadCategories();
-    renderItems();
 
-     function renderItems(items) {
-        const container = document.getElementById("items-container");
-        container.innerHTML = ""; // clear existing items
 
         items.forEach(item => {
             const card = document.createElement("div");
@@ -433,6 +428,7 @@ window.onload = fetchItems;
     
 </body>
 </html>
+
 
 
 
