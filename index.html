@@ -374,8 +374,28 @@
 
     loadCategories();
     renderItems();
+    const GITHUB_USERNAME = "michaelandrewzebra-design";
+  const REPO_NAME = "tipssAS";
+  const FILE_PATH = "items.json";
+  const BRANCH = "main";
+
+  async function fetchItems() {
+    const url = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/${FILE_PATH}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to load items.json");
+      const data = await response.json();
+      console.log("Items loaded:", data);
+      renderItems(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  window.onload = fetchItems;
 </script>
 
 </body>
 </html>
+
 
