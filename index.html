@@ -74,6 +74,26 @@
     }
     #adminIcon:hover { background: #66bbff; }
 
+    #refreshIcon {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: #4caf50;
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        z-index: 10;
+        transition: 0.3s;
+    }
+    #refreshIcon:hover { background: #5ccf5c; }
+
     #loginModal {
         position: fixed; top:0; left:0; width:100%; height:100%;
         background: rgba(0,0,0,0.6);
@@ -109,6 +129,7 @@
 <body>
 
 <div id="adminIcon" title="Admin Login">🔑</div>
+<div id="refreshIcon" title="Refresh Items">🔄</div>
 
 <div id="loginModal">
     <div class="login-box">
@@ -128,22 +149,19 @@
         <form id="addForm">
             <input type="text" id="name" placeholder="Item Name" required>
             <input type="text" id="price" placeholder="Price (e.g. $49.99)" required>
-            
-            <!-- Image upload -->
-            <input type="file" id="imageUpload" accept="image/*" required>
-            <img id="previewImg" style="display:none; width:100px; border-radius:6px; margin-bottom:10px;">
-            
+            <input type="url" id="image" placeholder="Image URL" required>
             <input type="url" id="link" placeholder="Affiliate Link" required>
-            <select id="category" required>
-                <option value="" disabled selected>Select Category</option>
-                <option>Electronics</option>
-                <option>Fashion</option>
-                <option>Books</option>
-                <option>Home</option>
-                <option>Other</option>
-            </select>
+            
+            <select id="category" required></select>
+            
+            <div style="width:100%; margin-top:10px;">
+                <input type="text" id="newCategory" placeholder="Type new category name here" style="width:70%;">
+                <button type="button" onclick="addCategory()">➕ Add Category</button>
+                <button type="button" onclick="removeCategory()">➖ Remove Category</button>
+            </div>
+
             <textarea id="desc" placeholder="Item Description" required></textarea>
-            <button type="submit">Add Item</button>
+            <button type="submit">Add / Update Item</button>
         </form>
 
         <div style="margin-bottom: 20px;">
@@ -155,17 +173,9 @@
         </div>
     </div>
 
-    <!-- Search -->
     <div id="searchContainer">
         <input type="text" id="searchInput" placeholder="Search items..." oninput="renderItems()">
-        <select id="categoryFilter" onchange="renderItems()">
-            <option value="">All Categories</option>
-            <option>Electronics</option>
-            <option>Fashion</option>
-            <option>Books</option>
-            <option>Home</option>
-            <option>Other</option>
-        </select>
+        <select id="categoryFilter" onchange="renderItems()"></select>
     </div>
 
     <div class="items" id="itemsList"></div>
@@ -181,27 +191,53 @@
     const loginError = document.getElementById("loginError");
     const itemsList = document.getElementById("itemsList");
     const adminIcon = document.getElementById("adminIcon");
+    const categorySelect = document.getElementById("category");
+    const categoryFilter = document.getElementById("categoryFilter");
 
     let items = JSON.parse(localStorage.getItem("tipssItems")) || [];
+    let categories = JSON.parse(localStorage.getItem("tipssCategories")) || ["Electronics","Fashion","Books","Home","Other"];
     let isAdmin = false;
     let editIndex = null;
-    let uploadedImage = "";
 
-    // Preview uploaded image
-    const imageUpload = document.getElementById("imageUpload");
-    const previewImg = document.getElementById("previewImg");
-    imageUpload.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                uploadedImage = event.target.result;
-                previewImg.src = uploadedImage;
-                previewImg.style.display = "block";
-            };
-            reader.readAsDataURL(file);
+    function loadCategories() {
+        categorySelect.innerHTML = `<option value="" disabled selected>Select Category</option>`;
+        categoryFilter.innerHTML = `<option value="">All Categories</option>`;
+        categories.forEach(cat => {
+            categorySelect.innerHTML += `<option>${cat}</option>`;
+            categoryFilter.innerHTML += `<option>${cat}</option>`;
+        });
+    }
+
+    function addCategory() {
+        const newCat = document.getElementById("newCategory").value.trim();
+        if(!newCat){ alert("Please enter a category name!"); return; }
+        if(!categories.includes(newCat)){
+            categories.push(newCat);
+            localStorage.setItem("tipssCategories", JSON.stringify(categories));
+            loadCategories();
+            alert(`Category "${newCat}" added.`);
+        } else {
+            alert("Category already exists!");
         }
-    });
+        document.getElementById("newCategory").value = "";
+    }
+
+    function removeCategory() {
+        const catToRemove = document.getElementById("newCategory").value.trim();
+        if(!catToRemove){ alert("Please enter a category name to remove!"); return; }
+        if(categories.includes(catToRemove)){
+            if(confirm(`Remove category "${catToRemove}"?`)){
+                categories = categories.filter(c => c !== catToRemove);
+                localStorage.setItem("tipssCategories", JSON.stringify(categories));
+                loadCategories();
+                renderItems();
+                alert(`Category "${catToRemove}" removed.`);
+            }
+        } else {
+            alert("Category not found!");
+        }
+        document.getElementById("newCategory").value = "";
+    }
 
     function login() {
         const input = document.getElementById("passwordInput").value;
@@ -242,7 +278,7 @@
         const newItem = {
             name: document.getElementById("name").value,
             price: document.getElementById("price").value,
-            image: uploadedImage || "",
+            image: document.getElementById("image").value,
             link: document.getElementById("link").value,
             desc: document.getElementById("desc").value,
             category: document.getElementById("category").value
@@ -257,8 +293,6 @@
 
         localStorage.setItem("tipssItems", JSON.stringify(items));
         form.reset();
-        previewImg.style.display = "none";
-        uploadedImage = "";
         renderItems();
     });
 
@@ -309,12 +343,10 @@
         const item = items[index];
         document.getElementById("name").value = item.name;
         document.getElementById("price").value = item.price;
+        document.getElementById("image").value = item.image;
         document.getElementById("link").value = item.link;
         document.getElementById("desc").value = item.desc;
         document.getElementById("category").value = item.category;
-        uploadedImage = item.image;
-        previewImg.src = item.image;
-        previewImg.style.display = "block";
         editIndex = index;
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -331,8 +363,19 @@
         setTimeout(()=>{ document.getElementById("passwordMessage").textContent = ""; }, 3000);
     }
 
+    // Refresh button
+    document.getElementById("refreshIcon").addEventListener("click", () => {
+        items = JSON.parse(localStorage.getItem("tipssItems")) || [];
+        categories = JSON.parse(localStorage.getItem("tipssCategories")) || categories;
+        loadCategories();
+        renderItems();
+        alert("Items refreshed!");
+    });
+
+    loadCategories();
     renderItems();
 </script>
 
 </body>
 </html>
+
