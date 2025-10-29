@@ -1,2 +1,25 @@
-[]
+[
+  {
+    "title": "Wireless Earbuds",
+    "price": "$29.99",
+    "category": "Electronics",
+    "image": "https://m.media-amazon.com/images/I/61CGHv6kmWL._AC_SL1500_.jpg",
+    "link": "https://www.amazon.com/dp/B09LVX5V3Q"
+  },
+  {
+    "title": "Portable Blender",
+    "price": "$25.99",
+    "category": "Home & Kitchen",
+    "image": "https://m.media-amazon.com/images/I/61l5bHh9gKL._AC_SL1500_.jpg",
+    "link": "https://www.amazon.com/dp/B08GC6PL3D"
+  },
+  {
+    "title": "Smartwatch Fitness Tracker",
+    "price": "$39.99",
+    "category": "Wearables",
+    "image": "https://m.media-amazon.com/images/I/61M8t3H7V-L._AC_SL1500_.jpg",
+    "link": "https://www.amazon.com/dp/B0B6L4B3PB"
+  }
+]
+
 
