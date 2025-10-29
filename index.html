@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tipss | Affiliate Store</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #e3e8ef, #c8d3e5);
+        color: #222;
+        margin: 0;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    h1 { margin-bottom: 10px; color: #354a74; }
+    h2 { color: #4a5d85; margin-bottom: 25px; font-weight: normal; }
+
+    form { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 25px; }
+    input, textarea, select { width: 48%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; background-color: #f9fafc; }
+    textarea { width: 100%; resize: none; height: 60px; }
+    select { width: 48%; }
+
+    button { background-color: #3f7be0; color: white; border: none; border-radius: 6px; padding: 10px 15px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    button:hover { background-color: #558cf0; }
+
+    .items { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+    .item-card { background: #f5f7fb; width: 260px; padding: 10px; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); text-align: left; transition: 0.3s; }
+    .item-card:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+    .item-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; }
+
+    .item-info { margin-top: 10px; }
+    .item-info h3 { margin: 5px 0; color: #2c3e5b; }
+    .price { color: #246cb3; font-weight: bold; }
+    .desc { font-size: 0.9em; color: #555; margin: 5px 0; }
+    .category { font-size: 0.85em; color: #888; font-style: italic; }
+
+    .actions { display: flex; justify-content: space-between; margin-top: 10px; }
+    .edit-btn, .delete-btn, .buy-btn { flex: 1; margin: 2px; border: none; border-radius: 5px; padding: 6px; cursor: pointer; font-weight: bold; }
+    .edit-btn { background-color: #3fa9f5; color: white; }
+    .delete-btn { background-color: #ff4b4b; color: white; }
+    .buy-btn { background-color: #4caf50; color: white; }
+    .edit-btn:hover { background-color: #66bbff; }
+    .delete-btn:hover { background-color: #ff6b6b; }
+    .buy-btn:hover { background-color: #5ccf5c; }
+
+    #adminIcon {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: #3fa9f5;
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        z-index: 10;
+        transition: 0.3s;
+    }
+    #adminIcon:hover { background: #66bbff; }
+
+    #loginModal {
+        position: fixed; top:0; left:0; width:100%; height:100%;
+        background: rgba(0,0,0,0.6);
+        display:flex; align-items:center; justify-content:center;
+        z-index:20; display:none;
+    }
+    #loginModal .login-box {
+        background: #f5f7fb; padding: 30px; border-radius: 12px; width: 300px;
+        text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative;
+    }
+    #loginModal input { width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: red;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    #searchContainer { margin-bottom: 20px; }
+    #searchContainer input, #searchContainer select { width: 200px; margin-right: 10px; }
+</style>
+</head>
+<body>
+
+<div id="adminIcon" title="Admin Login">🔑</div>
+
+<div id="loginModal">
+    <div class="login-box">
+        <div class="close-btn" onclick="closeLogin()">✖</div>
+        <h2>Login to Tipss</h2>
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+        <button onclick="login()">Login</button>
+        <p style="color:red;" id="loginError"></p>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Tipss</h1>
+    <h2>Your Personal Affiliate Store</h2>
+
+    <div id="adminPanel" style="display:none;">
+        <form id="addForm">
+            <input type="text" id="name" placeholder="Item Name" required>
+            <input type="text" id="price" placeholder="Price (e.g. $49.99)" required>
+            
+            <!-- Image upload -->
+            <input type="file" id="imageUpload" accept="image/*" required>
+            <img id="previewImg" style="display:none; width:100px; border-radius:6px; margin-bottom:10px;">
+            
+            <input type="url" id="link" placeholder="Affiliate Link" required>
+            <select id="category" required>
+                <option value="" disabled selected>Select Category</option>
+                <option>Electronics</option>
+                <option>Fashion</option>
+                <option>Books</option>
+                <option>Home</option>
+                <option>Other</option>
+            </select>
+            <textarea id="desc" placeholder="Item Description" required></textarea>
+            <button type="submit">Add Item</button>
+        </form>
+
+        <div style="margin-bottom: 20px;">
+            <h3>Change Password</h3>
+            <input type="password" id="newPassword" placeholder="New Password">
+            <button onclick="changePassword()">Update Password</button>
+            <p style="color:green;" id="passwordMessage"></p>
+            <button onclick="logout()">Log Out</button>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="Search items..." oninput="renderItems()">
+        <select id="categoryFilter" onchange="renderItems()">
+            <option value="">All Categories</option>
+            <option>Electronics</option>
+            <option>Fashion</option>
+            <option>Books</option>
+            <option>Home</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div class="items" id="itemsList"></div>
+</div>
+
+<script>
+    if(!localStorage.getItem("tipssPassword")){
+        localStorage.setItem("tipssPassword", "20100301");
+    }
+
+    const loginModal = document.getElementById("loginModal");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginError = document.getElementById("loginError");
+    const itemsList = document.getElementById("itemsList");
+    const adminIcon = document.getElementById("adminIcon");
+
+    let items = JSON.parse(localStorage.getItem("tipssItems")) || [];
+    let isAdmin = false;
+    let editIndex = null;
+    let uploadedImage = "";
+
+    // Preview uploaded image
+    const imageUpload = document.getElementById("imageUpload");
+    const previewImg = document.getElementById("previewImg");
+    imageUpload.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                uploadedImage = event.target.result;
+                previewImg.src = uploadedImage;
+                previewImg.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function login() {
+        const input = document.getElementById("passwordInput").value;
+        const savedPassword = localStorage.getItem("tipssPassword");
+        if(input === savedPassword){
+            loginModal.style.display = "none";
+            isAdmin = true;
+            adminPanel.style.display = "block";
+            localStorage.setItem("tipssLoggedIn", "true");
+            renderItems();
+        } else {
+            loginError.textContent = "Incorrect password!";
+        }
+    }
+
+    function closeLogin() { loginModal.style.display = "none"; }
+    function logout() {
+        isAdmin = false;
+        adminPanel.style.display = "none";
+        localStorage.removeItem("tipssLoggedIn");
+        renderItems();
+    }
+
+    adminIcon.addEventListener("click", () => {
+        loginModal.style.display = "flex";
+        loginError.textContent = "";
+        document.getElementById("passwordInput").value = "";
+    });
+
+    if(localStorage.getItem("tipssLoggedIn") === "true"){
+        isAdmin = true;
+        adminPanel.style.display = "block";
+    }
+
+    const form = document.getElementById("addForm");
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const newItem = {
+            name: document.getElementById("name").value,
+            price: document.getElementById("price").value,
+            image: uploadedImage || "",
+            link: document.getElementById("link").value,
+            desc: document.getElementById("desc").value,
+            category: document.getElementById("category").value
+        };
+
+        if(editIndex !== null){
+            items[editIndex] = newItem;
+            editIndex = null;
+        } else {
+            items.push(newItem);
+        }
+
+        localStorage.setItem("tipssItems", JSON.stringify(items));
+        form.reset();
+        previewImg.style.display = "none";
+        uploadedImage = "";
+        renderItems();
+    });
+
+    function renderItems() {
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        const selectedCategory = document.getElementById("categoryFilter").value;
+        itemsList.innerHTML = "";
+
+        items.forEach((item, index) => {
+            if((!searchTerm || item.name.toLowerCase().includes(searchTerm) || item.desc.toLowerCase().includes(searchTerm)) &&
+               (!selectedCategory || item.category === selectedCategory)) {
+                
+                let actionButtons = "";
+                if(isAdmin){
+                    actionButtons = `
+                        <button class="edit-btn" onclick="editItem(${index})">Edit</button>
+                        <button class="delete-btn" onclick="deleteItem(${index})">Delete</button>
+                    `;
+                }
+                itemsList.innerHTML += `
+                    <div class="item-card">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="item-info">
+                            <h3>${item.name}</h3>
+                            <div class="price">${item.price}</div>
+                            <p class="desc">${item.desc}</p>
+                            <div class="category">${item.category}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="buy-btn" onclick="window.open('${item.link}', '_blank')">Buy</button>
+                            ${actionButtons}
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    function deleteItem(index) {
+        if(confirm("Delete this item?")){
+            items.splice(index,1);
+            localStorage.setItem("tipssItems", JSON.stringify(items));
+            renderItems();
+        }
+    }
+
+    function editItem(index) {
+        const item = items[index];
+        document.getElementById("name").value = item.name;
+        document.getElementById("price").value = item.price;
+        document.getElementById("link").value = item.link;
+        document.getElementById("desc").value = item.desc;
+        document.getElementById("category").value = item.category;
+        uploadedImage = item.image;
+        previewImg.src = item.image;
+        previewImg.style.display = "block";
+        editIndex = index;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function changePassword() {
+        const newPass = document.getElementById("newPassword").value;
+        if(newPass.length < 4){
+            alert("Password must be at least 4 characters!");
+            return;
+        }
+        localStorage.setItem("tipssPassword", newPass);
+        document.getElementById("newPassword").value = "";
+        document.getElementById("passwordMessage").textContent = "Password updated!";
+        setTimeout(()=>{ document.getElementById("passwordMessage").textContent = ""; }, 3000);
+    }
+
+    renderItems();
+</script>
+
+</body>
+</html>
