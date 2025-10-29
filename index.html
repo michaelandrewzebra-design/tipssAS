@@ -149,7 +149,7 @@
         <form id="addForm">
             <input type="text" id="name" placeholder="Item Name" required>
             <input type="text" id="price" placeholder="Price (e.g. $49.99)" required>
-            <input type="url" id="image" placeholder="Image URL" required>
+            <input type="file" id="imageUpload" accept="image/*" required>
             <input type="url" id="link" placeholder="Affiliate Link" required>
             
             <select id="category" required></select>
@@ -275,14 +275,22 @@
     const form = document.getElementById("addForm");
     form.addEventListener("submit", (e) => {
         e.preventDefault();
-        const newItem = {
-            name: document.getElementById("name").value,
-            price: document.getElementById("price").value,
-            image: document.getElementById("image").value,
-            link: document.getElementById("link").value,
-            desc: document.getElementById("desc").value,
-            category: document.getElementById("category").value
-        };
+     const imageFile = document.getElementById("imageUpload").files[0];
+let imageUrl = "";
+
+if (imageFile) {
+    imageUrl = URL.createObjectURL(imageFile);
+}
+
+const newItem = {
+    name: document.getElementById("name").value,
+    price: document.getElementById("price").value,
+    image: imageUrl,
+    link: document.getElementById("link").value,
+    desc: document.getElementById("desc").value,
+    category: document.getElementById("category").value
+};
+
 
         if(editIndex !== null){
             items[editIndex] = newItem;
@@ -425,6 +433,7 @@ window.onload = fetchItems;
     
 </body>
 </html>
+
 
 
 
