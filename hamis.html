@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tipss Affiliate Store</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #e3e8ef, #c8d3e5);
+        color: #222;
+        margin: 0;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    h1 { margin-bottom: 10px; color: #354a74; }
+    h2 { color: #4a5d85; margin-bottom: 25px; font-weight: normal; }
+
+    form { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-bottom: 25px; }
+    input, textarea, select { width: 48%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; background-color: #f9fafc; }
+    textarea { width: 100%; resize: none; height: 60px; }
+    select { width: 48%; }
+
+    button { background-color: #3f7be0; color: white; border: none; border-radius: 6px; padding: 10px 15px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    button:hover { background-color: #558cf0; }
+
+    .items { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+    .item-card { background: #f5f7fb; width: 260px; padding: 10px; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); text-align: left; transition: 0.3s; }
+    .item-card:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+    .item-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; }
+
+    .item-info { margin-top: 10px; }
+    .item-info h3 { margin: 5px 0; color: #2c3e5b; }
+    .price { color: #246cb3; font-weight: bold; }
+    .desc { font-size: 0.9em; color: #555; margin: 5px 0; }
+    .category { font-size: 0.85em; color: #888; font-style: italic; }
+
+    .actions { display: flex; justify-content: space-between; margin-top: 10px; }
+    .edit-btn, .delete-btn, .move-btn, .buy-btn { flex: 1; margin: 2px; border: none; border-radius: 5px; padding: 6px; cursor: pointer; font-weight: bold; }
+    .edit-btn { background-color: #3fa9f5; color: white; }
+    .delete-btn { background-color: #ff4b4b; color: white; }
+    .move-btn { background-color: #ffa726; color: white; }
+    .buy-btn { background-color: #4caf50; color: white; }
+    .edit-btn:hover { background-color: #66bbff; }
+    .delete-btn:hover { background-color: #ff6b6b; }
+    .move-btn:hover { background-color: #ffb74d; }
+    .buy-btn:hover { background-color: #5ccf5c; }
+
+    #adminIcon {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: #3fa9f5;
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        z-index: 10;
+        transition: 0.3s;
+    }
+    #adminIcon:hover { background: #66bbff; }
+
+    #refreshIcon {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: #4caf50;
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        z-index: 10;
+        transition: 0.3s;
+    }
+    #refreshIcon:hover { background: #5ccf5c; }
+
+    #loginModal {
+        position: fixed; top:0; left:0; width:100%; height:100%;
+        background: rgba(0,0,0,0.6);
+        display:flex; align-items:center; justify-content:center;
+        z-index:20; display:none;
+    }
+    #loginModal .login-box {
+        background: #f5f7fb; padding: 30px; border-radius: 12px; width: 300px;
+        text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative;
+    }
+    #loginModal input { width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: red;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    #searchContainer { margin-bottom: 20px; }
+    #searchContainer input, #searchContainer select { width: 200px; margin-right: 10px; }
+    .note { font-size: 0.85em; color: #666; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div id="adminIcon" title="Admin Login">🔑</div>
+<div id="refreshIcon" title="Refresh Items">🔄</div>
+
+<div id="loginModal">
+    <div class="login-box">
+        <div class="close-btn" onclick="closeLogin()">✖</div>
+        <h2>Login to Tipss Affiliate Store</h2>
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+        <button onclick="login()">Login</button>
+        <p style="color:red;" id="loginError"></p>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Tipss Affiliate Store</h1>
+    <h2>Your Personal Affiliate Store</h2>
+
+    <div id="adminPanel" style="display:none;">
+        <form id="addForm">
+            <input type="text" id="name" placeholder="Item Name" required>
+            <input type="text" id="price" placeholder="Price (e.g. $49.99)" required>
+            <input type="url" id="image" placeholder="Image URL" required>
+            <input type="url" id="link" placeholder="Affiliate Link" required>
+            
+            <select id="category" required></select>
+            
+            <div style="width:100%; margin-top:10px;">
+                <input type="text" id="newCategory" placeholder="Type new category name here" style="width:70%;">
+                <button type="button" onclick="addCategory()">➕ Add Category</button>
+                <button type="button" onclick="removeCategory()">➖ Remove Category</button>
+            </div>
+
+            <textarea id="desc" placeholder="Item Description" required></textarea>
+            <button type="submit">Add / Update Item</button>
+        </form>
+
+        <div style="margin-bottom: 20px;">
+            <h3>Change Password</h3>
+            <input type="password" id="newPassword" placeholder="New Password">
+            <button onclick="changePassword()">Update Password</button>
+            <p style="color:green;" id="passwordMessage"></p>
+            <button onclick="logout()">Log Out</button>
+        </div>
+    </div>
+
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="Search items..." oninput="renderItems()">
+        <select id="categoryFilter" onchange="renderItems()"></select>
+    </div>
+
+    <div class="items" id="itemsList"></div>
+    <p class="note">Note: Saving changes will prompt for a GitHub token to commit updates to your repo (requested every time)</p>
+</div>
+
+<script>
+/*
+  GitHub-backed Tipss Affiliate Store
+  - Loads from: https://raw.githubusercontent.com/michaelandrewzebra-design/tipssAS/main/items.json
+  - Saves via GitHub API: PUT /repos/{owner}/{repo}/contents/items.json
+  - Prompts for token each save (option 2)
+  - Commits use committer name: michaelandrewzebra-design
+*/
+
+const GITHUB_OWNER = "michaelandrewzebra-design";
+const GITHUB_REPO = "tipssAS";
+const FILE_PATH = "items.json";
+const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${FILE_PATH}`;
+const API_CONTENT_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
+
+let items = [];
+let categories = ["Electronics","Fashion","Books","Home","Other"]; // fallback defaults
+let isAdmin = false;
+let editIndex = null;
+
+// UI elements
+const itemsList = document.getElementById("itemsList");
+const categorySelect = document.getElementById("category");
+const categoryFilter = document.getElementById("categoryFilter");
+
+// Initialize password default if missing
+if(!localStorage.getItem("tipssPassword")){
+    localStorage.setItem("tipssPassword", "20100301");
+}
+
+// --- Utility: fetch remote items.json (raw) ---
+async function loadRemoteData() {
+    try {
+        const resp = await fetch(RAW_URL + "?t=" + Date.now());
+        if (!resp.ok) throw new Error("Not found");
+        const data = await resp.json();
+        // Expecting structure: { items: [...], categories: [...] }
+        if (Array.isArray(data.items) && Array.isArray(data.categories)) {
+            items = data.items;
+            categories = data.categories;
+        } else if (Array.isArray(data)) {
+            // older format: just items array -> migrate
+            items = data;
+            categories = ["Electronics","Fashion","Books","Home","Other"];
+        } else {
+            // fallback
+            items = data.items || [];
+            categories = data.categories || categories;
+        }
+        console.log("Loaded remote data:", {itemsCount: items.length, categories});
+    } catch (err) {
+        console.warn("Could not load remote items.json (it may not exist yet). Using local data.", err);
+        // keep local items/categories (could be empty). The user can save to create file.
+    }
+    loadCategories();
+    renderItems();
+}
+
+// --- Utility: get file metadata (to obtain sha) ---
+async function getFileMeta(token) {
+    const resp = await fetch(API_CONTENT_URL, {
+        headers: {
+            Authorization: `token ${token}`,
+            Accept: "application/vnd.github.v3+json"
+        }
+    });
+    if (resp.status === 404) return null;
+    if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`GitHub API error: ${resp.status} ${txt}`);
+    }
+    return resp.json();
+}
+
+// --- Utility: save to GitHub (prompts for token every time) ---
+async function saveRemoteData(commitMessage) {
+    // Prompt for token each time (option 2)
+    const token = prompt("Enter your GitHub Personal Access Token (will be used for this save only):");
+    if (!token) {
+        alert("Save cancelled (no token provided).");
+        return;
+    }
+
+    try {
+        // Get current file metadata to obtain sha (if exists)
+        const meta = await getFileMeta(token);
+        const sha = meta ? meta.sha : null;
+
+        const payload = {
+            message: commitMessage || `Update ${FILE_PATH} via Tipss UI`,
+            committer: {
+                name: GITHUB_OWNER,
+                email: `${GITHUB_OWNER}@users.noreply.github.com`
+            },
+            content: btoa(unescape(encodeURIComponent(JSON.stringify({ items, categories }, null, 2))))
+        };
+        if (sha) payload.sha = sha;
+
+        const putResp = await fetch(API_CONTENT_URL, {
+            method: "PUT",
+            headers: {
+                Authorization: `token ${token}`,
+                Accept: "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!putResp.ok) {
+            const txt = await putResp.text();
+            throw new Error(`Failed to save: ${putResp.status} ${txt}`);
+        }
+
+        const result = await putResp.json();
+        alert("Saved to GitHub successfully!");
+        // after save, reload remote data to ensure everything is up-to-date
+        await loadRemoteData();
+    } catch (err) {
+        console.error(err);
+        alert("Error saving to GitHub: " + err.message);
+    }
+}
+
+// --- UI helpers ---
+function loadCategories() {
+    categorySelect.innerHTML = `<option value="" disabled selected>Select Category</option>`;
+    categoryFilter.innerHTML = `<option value="">All Categories</option>`;
+    categories.forEach(cat => {
+        categorySelect.innerHTML += `<option>${cat}</option>`;
+        categoryFilter.innerHTML += `<option>${cat}</option>`;
+    });
+}
+
+function renderItems() {
+    const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    const selectedCategory = document.getElementById("categoryFilter").value;
+    itemsList.innerHTML = "";
+    if (!items || items.length === 0) {
+        itemsList.innerHTML = `<p style="color:#666;">No items yet. Add some from Admin (🔑) or import from GitHub.</p>`;
+        return;
+    }
+
+    items.forEach((item, index) => {
+        if (( !searchTerm || item.name.toLowerCase().includes(searchTerm) || (item.desc && item.desc.toLowerCase().includes(searchTerm)) ) &&
+            (!selectedCategory || item.category === selectedCategory)) {
+
+            let actionButtons = "";
+            if (isAdmin) {
+                actionButtons = `
+                    <button class="edit-btn" onclick="editItem(${index})">✏ Edit</button>
+                    <button class="delete-btn" onclick="deleteItem(${index})">🗑 Delete</button>
+                    <button class="move-btn" onclick="moveItem(${index})">↪ Move</button>
+                `;
+            }
+            itemsList.innerHTML += `
+                <div class="item-card">
+                    <img src="${escapeHtml(item.image || '')}" alt="${escapeHtml(item.name || '')}">
+                    <div class="item-info">
+                        <h3>${escapeHtml(item.name || '')}</h3>
+                        <div class="price">${escapeHtml(item.price || '')}</div>
+                        <p class="desc">${escapeHtml(item.desc || '')}</p>
+                        <div class="category">📁 ${escapeHtml(item.category || '')}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="buy-btn" onclick="window.open('${escapeAttr(item.link || '#')}', '_blank')">Buy</button>
+                        ${actionButtons}
+                    </div>
+                </div>
+            `;
+        }
+    });
+}
+
+// --- CRUD actions (these now call saveRemoteData with token prompt) ---
+document.getElementById("addForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newItem = {
+        name: document.getElementById("name").value.trim(),
+        price: document.getElementById("price").value.trim(),
+        image: document.getElementById("image").value.trim(),
+        link: document.getElementById("link").value.trim(),
+        desc: document.getElementById("desc").value.trim(),
+        category: document.getElementById("category").value
+    };
+
+    if (!newItem.name) { alert("Enter item name"); return; }
+    if (editIndex !== null) {
+        items[editIndex] = newItem;
+        editIndex = null;
+    } else {
+        items.push(newItem);
+    }
+
+    // Save to GitHub (will prompt token)
+    await saveRemoteData(editIndex === null ? `Add item "${newItem.name}" via Tipss UI` : `Update item "${newItem.name}" via Tipss UI`);
+    // reset form
+    e.target.reset();
+});
+
+function deleteItem(index) {
+    if (!confirm("Delete this item?")) return;
+    const removed = items.splice(index, 1)[0];
+    // Save to GitHub
+    saveRemoteData(`Delete item "${removed.name}" via Tipss UI`);
+}
+
+function editItem(index) {
+    const item = items[index];
+    document.getElementById("name").value = item.name;
+    document.getElementById("price").value = item.price;
+    document.getElementById("image").value = item.image;
+    document.getElementById("link").value = item.link;
+    document.getElementById("desc").value = item.desc;
+    document.getElementById("category").value = item.category;
+    editIndex = index;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function moveItem(index) {
+    const currentCat = items[index].category;
+    // show a small selection prompt using built-in prompt — user must write one of displayed categories
+    const newCat = prompt(`Move "${items[index].name}" from "${currentCat}" to which category?\nAvailable categories:\n${categories.join(", ")}`);
+    if (!newCat) return;
+    if (!categories.includes(newCat)) {
+        alert("That category does not exist. Please add it first in the admin panel.");
+        return;
+    }
+    items[index].category = newCat;
+    await saveRemoteData(`Move item "${items[index].name}" to "${newCat}" via Tipss UI`);
+}
+
+function addCategory() {
+    const newCat = document.getElementById("newCategory").value.trim();
+    if (!newCat) { alert("Please enter a category name!"); return; }
+    if (!categories.includes(newCat)) {
+        categories.push(newCat);
+        // Save to GitHub
+        saveRemoteData(`Add category "${newCat}" via Tipss UI`);
+        document.getElementById("newCategory").value = "";
+        loadCategories();
+    } else {
+        alert("Category already exists!");
+    }
+}
+
+function removeCategory() {
+    const catToRemove = document.getElementById("newCategory").value.trim();
+    if (!catToRemove) { alert("Please enter a category name to remove!"); return; }
+    if (categories.includes(catToRemove)) {
+        if (!confirm(`Remove category "${catToRemove}"? This won't delete items in that category.`)) return;
+        categories = categories.filter(c => c !== catToRemove);
+        saveRemoteData(`Remove category "${catToRemove}" via Tipss UI`);
+        document.getElementById("newCategory").value = "";
+        loadCategories();
+        renderItems();
+    } else {
+        alert("Category not found!");
+    }
+}
+
+function changePassword() {
+    const newPass = document.getElementById("newPassword").value;
+    if (newPass.length < 4) {
+        alert("Password must be at least 4 characters!");
+        return;
+    }
+    localStorage.setItem("tipssPassword", newPass);
+    document.getElementById("newPassword").value = "";
+    document.getElementById("passwordMessage").textContent = "Password updated!";
+    setTimeout(()=>{ document.getElementById("passwordMessage").textContent = ""; }, 3000);
+}
+
+document.getElementById("refreshIcon").addEventListener("click", async () => {
+    await loadRemoteData();
+    alert("Items refreshed!");
+});
+
+// Admin & login handling (unchanged behavior)
+const loginModal = document.getElementById("loginModal");
+const adminPanel = document.getElementById("adminPanel");
+const loginError = document.getElementById("loginError");
+const adminIcon = document.getElementById("adminIcon");
+
+adminIcon.addEventListener("click", () => {
+    loginModal.style.display = "flex";
+    loginError.textContent = "";
+    document.getElementById("passwordInput").value = "";
+});
+
+function login() {
+    const input = document.getElementById("passwordInput").value;
+    const savedPassword = localStorage.getItem("tipssPassword");
+    if (input === savedPassword) {
+        loginModal.style.display = "none";
+        isAdmin = true;
+        adminPanel.style.display = "block";
+        localStorage.setItem("tipssLoggedIn", "true");
+        renderItems();
+    } else {
+        loginError.textContent = "Incorrect password!";
+    }
+}
+function closeLogin() { loginModal.style.display = "none"; }
+function logout() {
+    isAdmin = false;
+    adminPanel.style.display = "none";
+    localStorage.removeItem("tipssLoggedIn");
+    renderItems();
+}
+if (localStorage.getItem("tipssLoggedIn") === "true") {
+    isAdmin = true;
+    adminPanel.style.display = "block";
+}
+
+// --- Small helpers to sanitize output for safety ---
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str).replace(/[&<>"']/g, function(m) {
+        return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m];
+    });
+}
+function escapeAttr(str) {
+    if (!str) return "#";
+    return String(str).replace(/"/g, '%22').replace(/'/g, '%27');
+}
+
+// Initial load
+loadRemoteData();
+</script>
+
+</body>
+</html>
