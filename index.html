@@ -386,13 +386,17 @@ const newItem = {
 const REPO_NAME = "tipssAS";
 const FILE_PATH = "items.json";
 const BRANCH = "main";
-
+    
+// When the page loads, fetch and show items + categories
+window.onload = function () {
+    loadCategories();
+    renderItems();
+};
 
 </script>
-    
-
 </body>
 </html>
+
 
 
 
