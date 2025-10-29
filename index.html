@@ -381,24 +381,6 @@ const newItem = {
     });
 
 
-
-        items.forEach(item => {
-            const card = document.createElement("div");
-            card.style.background = "#fff";
-            card.style.borderRadius = "12px";
-            card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
-            card.style.padding = "16px";
-            card.style.margin = "12px 0";
-            card.style.textAlign = "center";
-
-            card.innerHTML = `
-                <h3>${item.title}</h3>
-                <p><strong>Category:</strong> ${item.category}</p>
-                <p><strong>Price:</strong> ${item.price}</p>
-            `;
-            container.appendChild(card);
-        });
-    }
     
    const GITHUB_USERNAME = "michaelandrewzebra-design";
 const REPO_NAME = "tipssAS";
@@ -427,6 +409,7 @@ window.onload = fetchItems;
 <div id="items-container" style="padding:20px;"></div>
 </body>
 </html>
+
 
 
 
